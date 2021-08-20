@@ -69,15 +69,19 @@ impl<N, E> Graph<N, E> {
         index
     }
 
-    pub fn get_outgoing_edges(&self, node_index: NodeIndex) -> Edges<E> {
-        return Edges {
+    pub fn edges(&self, node_index: NodeIndex) -> Edges<E> {
+        let node = self.nodes.get(node_index);
+        Edges {
             edges: &self.edges,
-            next: match self.nodes.get(node_index) {
+            outgoing: match node {
                 Some(node) => node.outgoing,
                 None => EdgeIndex::None,
             },
-            edgeType: EdgeType::Outgoing,
-        };
+            incoming: match node {
+                Some(node) => node.incoming,
+                None => EdgeIndex::None,
+            },
+        }
     }
 
     fn get_nodes(
@@ -124,6 +128,7 @@ pub enum EdgeType {
     Incoming,
 }
 
+#[derive(Debug)]
 pub struct EdgeReference<'a, E> {
     index: EdgeIndex,
     node: [NodeIndex; 2],
@@ -132,8 +137,8 @@ pub struct EdgeReference<'a, E> {
 
 pub struct Edges<'a, E> {
     edges: &'a [Edge<E>],
-    next: EdgeIndex,
-    edgeType: EdgeType,
+    outgoing: EdgeIndex,
+    incoming: EdgeIndex,
 }
 
 // Iterator for edges. Should take the next edgeindex.
@@ -144,25 +149,33 @@ impl<'a, E> Iterator for Edges<'a, E> {
     type Item = EdgeReference<'a, E>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let index = match self.next {
-            EdgeIndex::Index(index) => index,
-            EdgeIndex::None => return None,
+        if let EdgeIndex::Index(index) = self.outgoing {
+            let val = self.edges.get(index);
+
+            if let Some(edge) = val {
+                self.outgoing = edge.outgoing;
+
+                return Some(EdgeReference {
+                    index: EdgeIndex::Index(index),
+                    node: [edge.source, edge.destination],
+                    weight: &edge.weight,
+                });
+            }
         };
 
-        let val = self.edges.get(index);
+        if let EdgeIndex::Index(index) = self.incoming {
+            let val = self.edges.get(index);
 
-        if let Some(edge) = val {
-            self.next = match self.edgeType {
-                EdgeType::Incoming => edge.incoming,
-                EdgeType::Outgoing => edge.outgoing,
-            };
+            if let Some(edge) = val {
+                self.incoming = edge.incoming;
 
-            return Some(EdgeReference {
-                index: EdgeIndex::Index(index),
-                node: [edge.source, edge.destination],
-                weight: &edge.weight,
-            });
-        }
+                return Some(EdgeReference {
+                    index: EdgeIndex::Index(index),
+                    node: [edge.source, edge.destination],
+                    weight: &edge.weight,
+                });
+            }
+        };
 
         return None;
     }
