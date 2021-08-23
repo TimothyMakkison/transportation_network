@@ -131,7 +131,7 @@ pub enum EdgeType {
 #[derive(Debug)]
 pub struct EdgeReference<'a, E> {
     index: EdgeIndex,
-    node: [NodeIndex; 2],
+    nodes: [NodeIndex; 2],
     weight: &'a E,
 }
 
@@ -157,7 +157,7 @@ impl<'a, E> Iterator for Edges<'a, E> {
 
                 return Some(EdgeReference {
                     index: EdgeIndex::Index(index),
-                    node: [edge.source, edge.destination],
+                    nodes: [edge.source, edge.destination],
                     weight: &edge.weight,
                 });
             }
@@ -171,7 +171,7 @@ impl<'a, E> Iterator for Edges<'a, E> {
 
                 return Some(EdgeReference {
                     index: EdgeIndex::Index(index),
-                    node: [edge.source, edge.destination],
+                    nodes: [edge.destination, edge.source],
                     weight: &edge.weight,
                 });
             }

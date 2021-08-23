@@ -1,27 +1,67 @@
-mod graph;
+use nom::{
+    bytes::complete::{tag, take_while_m_n},
+    combinator::map_res,
+    sequence::tuple,
+    IResult,
+};
 
-use graph::graph::Graph;
-use serde::Deserialize;
-use std::error::Error;
-use std::process;
-use std::{fs, io};
+#[derive(Debug, PartialEq)]
+pub struct Color {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
+
+fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
+    u8::from_str_radix(input, 16)
+}
+
+fn is_hex_digit(c: char) -> bool {
+    c.is_digit(16)
+}
+
+fn hex_primary(input: &str) -> IResult<&str, u8> {
+    map_res(take_while_m_n(2, 2, is_hex_digit), from_hex)(input)
+}
+
+fn hex_color(input: &str) -> IResult<&str, Color> {
+    let (input, _) = tag("#")(input)?;
+    let (input, (red, green, blue)) = tuple((hex_primary, hex_primary, hex_primary))(input)?;
+
+    Ok((input, Color { red, green, blue }))
+}
 
 fn main() {
-    let mut graph = Graph::new();
+    assert_eq!(
+        hex_color("#2F14DF"),
+        Ok((
+            "",
+            Color {
+                red: 47,
+                green: 20,
+                blue: 223,
+            }
+        ))
+    );
+}
 
-    let node_a = graph.add_node("a");
-    let node_b = graph.add_node("b");
-    let node_c = graph.add_node("c");
-    let node_d = graph.add_node("d");
-    let node_e = graph.add_node("e");
-    graph.add_edge(node_a, node_d, 1);
-    graph.add_edge(node_a, node_b, 6);
+// fn dijkstra<E, F>(graph:Graph<E,F>,start:NodeIndex,) -> HashMap<NodeIndex, NodeIndex> {}
 
-    graph.add_edge(node_d, node_b, 2);
-    graph.add_edge(node_d, node_e, 1);
+pub enum Commands {
+    MaxDist,
+    MaxLink,
+    FindDist(i32, i32),
+    FindNeighbour(i32),
+    Check(TravelMode, Vec<i32>),
+    FindRoute(TravelMode, i32, i32),
+    FindShortestRoute(TravelMode, i32, i32),
+}
 
-    graph.add_edge(node_e, node_b, 2);
-    graph.add_edge(node_e, node_c, 5);
-
-    graph.add_edge(node_b, node_c, 5);
+pub enum TravelMode {
+    Foot,
+    Bike,
+    Rail,
+    Car,
+    Bus,
+    Ship,
 }
