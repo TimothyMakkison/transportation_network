@@ -1,0 +1,2 @@
+Make NodeIndex into type deriving from usize.
+Add Djikstra
