@@ -1,15 +1,5 @@
-use learning_graph::parser::parser;
+use learning_graph::parser::parse_command;
 
-// fn main() {
-//     let c1 = "MaxDist";
-//     let c2 = "MaxLink";
-
-//     let a = parser("MaxLink");
-//     let b = parser("MaxDist");
-
-//     println!("{:?}", a.unwrap().1);
-//     println!("{:?}", b.unwrap().1);
-// }
 use std::fs::{self};
 
 fn main() {
@@ -21,7 +11,7 @@ fn main() {
     for line in lines {
         println!("{:?}", line);
 
-        let parsed = parser(line.as_bytes());
-        println!("{:?}", parsed.unwrap().1);
+        let parsed = parse_command(line.as_bytes());
+        println!("{:?}", parsed.expect("Error parsing").1);
     }
 }
