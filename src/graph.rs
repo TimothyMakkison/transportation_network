@@ -111,7 +111,6 @@ impl<N, E> Graph<N, E> {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
 pub type NodeIndex = usize;
 
 #[derive(Debug, Clone, Copy)]
