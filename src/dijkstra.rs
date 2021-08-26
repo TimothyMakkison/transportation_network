@@ -26,6 +26,9 @@ where
         if goal == Some(node_id) {
             break;
         }
+        if (visited.contains(&node_id)) {
+            continue;
+        }
 
         visited.insert(node_id);
 
