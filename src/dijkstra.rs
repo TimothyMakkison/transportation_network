@@ -1,32 +1,35 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::ops::Add;
 
-use crate::graph::Node;
 use crate::graph::{EdgeRef, Graph, NodeIndex};
 use crate::scored::MinScored;
 
-pub fn dijkstra<N, E, T, S>(
+pub fn dijkstra<N, E, T, S, C>(
     graph: Graph<N, E>,
     start: NodeIndex,
     goal: Option<NodeIndex>,
     get_cost: S,
     traversable: T,
-) -> HashMap<NodeIndex, i32>
+) -> HashMap<NodeIndex, C>
 where
-    S: Fn(&E) -> i32,
+    S: Fn(&E) -> C,
     T: Fn(&E) -> bool,
+    C: Default + Ord + PartialOrd + Add<C, Output = C> + Default + Clone + Copy,
 {
     let mut unvisited_queue = BinaryHeap::new();
     let mut visited = HashSet::new();
     let mut scores = HashMap::new();
 
-    unvisited_queue.push(MinScored(0, start));
-    scores.insert(start, 0);
+    let default_score = C::default();
+
+    unvisited_queue.push(MinScored(default_score, start));
+    scores.insert(start, default_score);
 
     while let Some(MinScored(score, node_id)) = unvisited_queue.pop() {
         if goal == Some(node_id) {
             break;
         }
-        if (visited.contains(&node_id)) {
+        if visited.contains(&node_id) {
             continue;
         }
 
