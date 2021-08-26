@@ -1,15 +1,15 @@
 use std::cmp::max;
 
 #[derive(Clone, Copy, Debug)]
-struct Node<N> {
+pub struct Node<N> {
     data: N,
     outgoing: EdgeIndex,
     incoming: EdgeIndex,
 }
 
 #[derive(Clone, Copy, Debug)]
-struct Edge<E> {
-    weight: E,
+pub struct Edge<E> {
+    data: E,
 
     source: NodeIndex,
     destination: NodeIndex,
@@ -53,7 +53,7 @@ impl<N, E> Graph<N, E> {
             Graph::<N, E>::get_nodes(&mut self.nodes, source_index, dest_index);
 
         let edge = Edge {
-            weight,
+            data: weight,
             source: source_index,
             destination: dest_index,
             outgoing: source_node.outgoing,
@@ -84,6 +84,10 @@ impl<N, E> Graph<N, E> {
         }
     }
 
+    pub fn raw_nodes(&self) -> &[Node<N>] {
+        &self.nodes
+    }
+
     fn get_nodes(
         nodes: &mut Vec<Node<N>>,
         index_a: NodeIndex,
@@ -107,6 +111,7 @@ impl<N, E> Graph<N, E> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub type NodeIndex = usize;
 
 #[derive(Debug, Clone, Copy)]
@@ -130,9 +135,26 @@ pub enum EdgeType {
 
 #[derive(Debug)]
 pub struct EdgeReference<'a, E> {
-    index: EdgeIndex,
-    nodes: [NodeIndex; 2],
-    weight: &'a E,
+    pub index: EdgeIndex,
+    pub nodes: [NodeIndex; 2],
+    pub data: &'a E,
+}
+
+pub trait EdgeRef {
+    fn source(&self) -> NodeIndex;
+    fn destination(&self) -> NodeIndex;
+}
+//     fn index(&self) -> EdgeIndex;
+//     fn data(&self) -> &'a E;
+// }
+
+impl<'a, E> EdgeRef for EdgeReference<'a, E> {
+    fn source(&self) -> NodeIndex {
+        self.nodes[0]
+    }
+    fn destination(&self) -> NodeIndex {
+        self.nodes[1]
+    }
 }
 
 pub struct Edges<'a, E> {
@@ -158,7 +180,7 @@ impl<'a, E> Iterator for Edges<'a, E> {
                 return Some(EdgeReference {
                     index: EdgeIndex::Index(index),
                     nodes: [edge.source, edge.destination],
-                    weight: &edge.weight,
+                    data: &edge.data,
                 });
             }
         };
@@ -171,8 +193,9 @@ impl<'a, E> Iterator for Edges<'a, E> {
 
                 return Some(EdgeReference {
                     index: EdgeIndex::Index(index),
+                    // Swap nodes
                     nodes: [edge.destination, edge.source],
-                    weight: &edge.weight,
+                    data: &edge.data,
                 });
             }
         };

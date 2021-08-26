@@ -120,6 +120,8 @@ pub enum TravelMode {
     Rail,
 }
 
+//TODO Replace with macros
+
 fn parse_foot(i: &[u8]) -> IResult<&[u8], TravelMode> {
     let (a, _) = tag("Foot")(i)?;
     Ok((a, TravelMode::Foot))
