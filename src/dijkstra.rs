@@ -9,7 +9,7 @@ pub fn dijkstra<N, E, T, S, C>(
     goal: Option<NodeIndex>,
     get_cost: S,
     traversable: T,
-) -> HashMap<NodeIndex, C>
+) -> HashMap<NodeIndex, (C, NodeIndex)>
 where
     S: Fn(&E) -> C,
     T: Fn(&E) -> bool,
@@ -22,7 +22,7 @@ where
     let default_score = C::default();
 
     unvisited_queue.push(MinScored(default_score, start));
-    scores.insert(start, default_score);
+    scores.insert(start, (default_score, start));
 
     while let Some(MinScored(score, node_id)) = unvisited_queue.pop() {
         if goal == Some(node_id) {
@@ -46,15 +46,15 @@ where
             scores
                 .entry(dest_id)
                 .and_modify(|entry| {
-                    if total_cost < *entry {
+                    if total_cost < (*entry).0 {
                         // Update score in priority queue
                         unvisited_queue.push(MinScored(total_cost, dest_id));
-                        *entry = total_cost
+                        *entry = (total_cost, node_id)
                     }
                 })
                 .or_insert({
                     unvisited_queue.push(MinScored(total_cost, dest_id));
-                    total_cost
+                    (total_cost, node_id)
                 });
         }
     }
