@@ -8,6 +8,8 @@ use nom::{
     IResult,
 };
 
+use crate::models::{Command, TravelMode};
+
 fn parse_int(i: &[u8]) -> IResult<&[u8], i32> {
     let (remainder, digits) = take_while(is_digit)(i)?;
     let (_, integer) = i32(digits)?;
@@ -98,26 +100,6 @@ pub fn parse_mode(input: &[u8]) -> IResult<&[u8], TravelMode> {
     alt((
         parse_foot, parse_bike, parse_rail, parse_car, parse_bus, parse_ship,
     ))(input)
-}
-
-#[derive(Debug)]
-pub enum Command {
-    MaxDist,
-    MaxLink,
-    FindDist(i32, i32),
-    FindNeighbour(i32),
-    Check(TravelMode, Vec<i32>),
-    FindRoute(TravelMode, i32, i32),
-    FindShortestRoute(TravelMode, i32, i32),
-}
-#[derive(Debug)]
-pub enum TravelMode {
-    Foot,
-    Bike,
-    Car,
-    Bus,
-    Ship,
-    Rail,
 }
 
 //TODO Replace with macros

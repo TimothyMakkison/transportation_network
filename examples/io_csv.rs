@@ -1,29 +1,5 @@
 use csv::ReaderBuilder;
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize)]
-enum TransportType {
-    Foot,
-    Bike,
-    Car,
-    Bus,
-    Rail,
-    Ship,
-}
-#[derive(Debug, Deserialize)]
-struct Link {
-    start: i32,
-    end: i32,
-    mode: TransportType,
-}
-
-#[derive(Debug, Deserialize)]
-struct Place {
-    name: String,
-    id: i32,
-    latitude: f32,
-    longitude: f32,
-}
+use learning_graph::models::{Link, Place};
 
 fn main() {
     let places_path = "Places.csv";
