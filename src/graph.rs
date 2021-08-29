@@ -2,7 +2,7 @@ use std::cmp::max;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Node<N> {
-    data: N,
+    pub data: N,
     outgoing: EdgeIndex,
     incoming: EdgeIndex,
 }
@@ -18,7 +18,7 @@ pub struct Edge<E> {
     incoming: EdgeIndex,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Graph<N, E> {
     nodes: Vec<Node<N>>,
     edges: Vec<Edge<E>>,
@@ -30,6 +30,10 @@ impl<N, E> Graph<N, E> {
             nodes: Vec::new(),
             edges: Vec::new(),
         }
+    }
+
+    pub fn get_node(&self, index: NodeIndex) -> Option<&Node<N>> {
+        self.nodes.get(index)
     }
 
     pub fn add_node(&mut self, data: N) -> NodeIndex {
