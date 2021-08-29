@@ -41,11 +41,6 @@ impl Place {
             longitude,
         }
     }
-
-    /// Get a reference to the place's id.
-    pub fn id(&self) -> &i32 {
-        &self.id
-    }
 }
 
 impl Display for Place {
