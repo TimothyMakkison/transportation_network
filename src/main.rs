@@ -1,29 +1,40 @@
 use learning_graph::{
     dijkstra::dijkstra,
     graph::{Graph, NodeIndex},
-    models::{Command, TravelMode},
+    models::{Command, Link, Place, TravelMode},
     parser::parse_command,
+    serialization::{read_commands, read_links, read_places},
 };
 
-use std::{collections::HashMap, fmt::Display, fs};
+use std::{collections::HashMap, fmt::Display, fs, hash::Hash};
 
 fn main() {
+    let places_path = "Places.csv";
+    let links_path = "Links.csv";
+
+    let nodes = read_places(places_path);
+    let links = read_links(links_path);
+
+    // let edges =
     let commands = read_commands("Commands.txt");
     println!("{:?}", commands);
 }
 
-fn read_commands(path: &str) -> Result<Vec<Command>, &'static str> {
-    let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
+// fn build_graph(
+//     nodes: Vec<Place>,
+//     edges: Vec<Link>,
+// ) -> (Graph<Place, Link>, HashMap<i32, NodeIndex>) {
+//     let mut graph = Graph::new();
+//     let mut map = HashMap::new();
 
-    let mut commands = vec![];
-    for line in contents.lines() {
-        println!("{:?}", line);
+//     for node in nodes {
+//         let boxed = Box::new(node);
+//         let node_index = graph.add_node(node);
+//         map.insert(node.id, node_index);
+//     }
 
-        let parsed = parse_command(line.as_bytes());
-        commands.push(parsed.unwrap().1);
-    }
-    return Ok(commands);
-}
+//     (graph, map)
+// }
 
 fn process_command<E, N>(
     graph: &Graph<E, N>,

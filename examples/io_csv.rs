@@ -1,27 +1,18 @@
-use csv::ReaderBuilder;
-use learning_graph::models::{Link, Place};
+use learning_graph::serialization::{read_links, read_places};
 
 fn main() {
     let places_path = "Places.csv";
     let links_path = "Links.csv";
 
-    let mut rdr = ReaderBuilder::default()
-        .has_headers(false)
-        .from_path(places_path)
-        .unwrap();
+    let places = read_places(places_path);
 
-    for result in rdr.deserialize() {
-        let record: Place = result.unwrap();
-        println!("{:?}", record);
+    for place in places {
+        println!("{:?}", place);
     }
 
-    let mut rdlink = ReaderBuilder::default()
-        .has_headers(false)
-        .from_path(links_path)
-        .unwrap();
+    let links = read_links(links_path);
 
-    for result in rdlink.deserialize() {
-        let record: Link = result.unwrap();
-        println!("{:?}", record);
+    for link in links {
+        println!("{:?}", link);
     }
 }
