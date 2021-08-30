@@ -19,8 +19,8 @@ impl Display for TravelMode {
 
 #[derive(Debug, Deserialize, Clone, Copy)]
 pub struct Link {
-    start: i32,
-    end: i32,
+    pub start: i32,
+    pub end: i32,
     mode: TravelMode,
 }
 
