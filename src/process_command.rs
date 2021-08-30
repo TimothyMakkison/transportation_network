@@ -13,7 +13,7 @@ pub fn process(
 ) -> String {
     match command {
         Command::MaxDist => "max dist".to_string(),
-        Command::FindNeighbour(place) => place.to_string(),
+        Command::FindNeighbour(place) => find_neighbour(&graph, node_map, place),
         Command::FindShortestRoute(_, _, _) => find_shortest_route(&graph, node_map, command),
         _ => "Not impl".to_string(),
         Command::MaxLink => todo!(),
@@ -21,6 +21,23 @@ pub fn process(
         Command::Check(_, _) => todo!(),
         Command::FindRoute(_, _, _) => todo!(),
     }
+}
+
+fn find_neighbour(
+    graph: &Graph<PlaceCopy, Link>,
+    id_map: &HashMap<i32, NodeIndex>,
+    id: i32,
+) -> String {
+    let node_id = id_map.get(&id).unwrap();
+    let node = graph.get_node(*node_id).unwrap();
+
+    let mut output = format!("FindNeighbour {}", node.data.id);
+    for neighbour in graph.edges(*node_id) {
+        let dest = graph.get_node(neighbour.nodes[1]).unwrap();
+        output = format!("{}\n{}", output, dest.data.id);
+    }
+
+    output
 }
 
 fn find_shortest_route(
