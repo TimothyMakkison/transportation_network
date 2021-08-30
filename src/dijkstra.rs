@@ -4,7 +4,7 @@ use std::ops::Add;
 use crate::graph::{EdgeRef, Graph, NodeIndex};
 
 pub fn dijkstra<N, E, T, S, C>(
-    graph: Graph<N, E>,
+    graph: &Graph<N, E>,
     start: NodeIndex,
     goal: Option<NodeIndex>,
     get_cost: S,
