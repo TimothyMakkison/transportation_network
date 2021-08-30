@@ -81,7 +81,7 @@ fn parse_findfastestroute(i: &[u8]) -> IResult<&[u8], Command> {
         parse_int,
     ))(i)?;
 
-    Ok((input, Command::FindRoute(mode, a, b)))
+    Ok((input, Command::FindShortestRoute(mode, a, b)))
 }
 
 pub fn parse_command(input: &[u8]) -> IResult<&[u8], Command> {
