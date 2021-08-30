@@ -21,7 +21,7 @@ impl Display for TravelMode {
 pub struct Link {
     pub start: i32,
     pub end: i32,
-    mode: TravelMode,
+    pub mode: TravelMode,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -34,7 +34,7 @@ pub struct Place {
 
 impl Place {
     pub fn new(name: String, id: i32, latitude: f32, longitude: f32) -> Self {
-        Place {
+        Self {
             name,
             id,
             latitude,
@@ -44,6 +44,29 @@ impl Place {
 }
 
 impl Display for Place {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct PlaceCopy {
+    pub id: i32,
+    latitude: f32,
+    longitude: f32,
+}
+
+impl PlaceCopy {
+    pub fn from_place(source: Place) -> PlaceCopy {
+        PlaceCopy {
+            id: source.id,
+            latitude: source.latitude,
+            longitude: source.latitude,
+        }
+    }
+}
+
+impl Display for PlaceCopy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
