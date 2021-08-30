@@ -11,30 +11,41 @@ use std::{collections::HashMap, fmt::Display, fs, hash::Hash};
 fn main() {
     let places_path = "Places.csv";
     let links_path = "Links.csv";
+    let command_path = "Commands.txt";
 
     let nodes = read_places(places_path);
     let links = read_links(links_path);
 
-    // let edges =
-    let commands = read_commands("Commands.txt");
+    let (graph, map) = build_graph(nodes, links);
+
+    println!("{:?}", graph);
+
+    let commands = read_commands(command_path).unwrap();
+
     println!("{:?}", commands);
 }
 
-// fn build_graph(
-//     nodes: Vec<Place>,
-//     edges: Vec<Link>,
-// ) -> (Graph<Place, Link>, HashMap<i32, NodeIndex>) {
-//     let mut graph = Graph::new();
-//     let mut map = HashMap::new();
+fn build_graph(
+    nodes: Vec<Place>,
+    edges: Vec<Link>,
+) -> (Graph<Place, Link>, HashMap<i32, NodeIndex>) {
+    let mut graph = Graph::new();
+    let mut map = HashMap::new();
 
-//     for node in nodes {
-//         let boxed = Box::new(node);
-//         let node_index = graph.add_node(node);
-//         map.insert(node.id, node_index);
-//     }
+    for node in nodes {
+        let id = node.id;
+        let node_index = graph.add_node(node);
+        map.insert(id, node_index);
+    }
 
-//     (graph, map)
-// }
+    for edge in edges {
+        let a = map.get(&edge.start).unwrap();
+        let b = map.get(&edge.end).unwrap();
+        graph.add_edge(*a, *b, edge);
+    }
+
+    (graph, map)
+}
 
 fn process_command<E, N>(
     graph: &Graph<E, N>,
