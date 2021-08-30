@@ -92,6 +92,10 @@ impl<N, E> Graph<N, E> {
         &self.nodes
     }
 
+    pub fn raw_edges(&self) -> &[Edge<E>] {
+        &self.edges
+    }
+
     fn get_nodes(
         nodes: &mut Vec<Node<N>>,
         index_a: NodeIndex,
