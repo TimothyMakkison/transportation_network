@@ -1,56 +1,56 @@
-use std::{collections::HashMap, fmt::Display};
+use std::collections::HashMap;
 
 use crate::{
     dijkstra::dijkstra,
-    graph::{Graph, NodeIndex},
+    graph::{EdgeRef, Graph, NodeIndex},
     models::{Command, Link, PlaceCopy, TravelMode},
 };
 
-pub fn process(
-    graph: &Graph<PlaceCopy, Link>,
-    node_map: &HashMap<i32, NodeIndex>,
-    command: Command,
-) -> String {
-    match command {
-        Command::MaxDist => "max dist".to_string(),
-        Command::FindNeighbour(place) => find_neighbour(&graph, node_map, place),
-        Command::FindShortestRoute(_, _, _) => find_shortest_route(&graph, node_map, command),
-        _ => "Not impl".to_string(),
-        Command::MaxLink => todo!(),
-        Command::FindDist(_, _) => todo!(),
-        Command::Check(_, _) => todo!(),
-        Command::FindRoute(_, _, _) => todo!(),
-    }
+pub struct CommandProcessor {
+    graph: Graph<PlaceCopy, Link>,
+    id_map: HashMap<i32, NodeIndex>,
 }
 
-fn find_neighbour(
-    graph: &Graph<PlaceCopy, Link>,
-    id_map: &HashMap<i32, NodeIndex>,
-    id: i32,
-) -> String {
-    let node_id = id_map.get(&id).unwrap();
-    let node = graph.get_node(*node_id).unwrap();
-
-    let mut output = format!("FindNeighbour {}", node.data.id);
-    for neighbour in graph.edges(*node_id) {
-        let dest = graph.get_node(neighbour.nodes[1]).unwrap();
-        output = format!("{}\n{}", output, dest.data.id);
+impl CommandProcessor {
+    pub fn new(graph: Graph<PlaceCopy, Link>, id_map: HashMap<i32, NodeIndex>) -> Self {
+        Self { graph, id_map }
     }
 
-    output
-}
+    pub fn process(&self, command: Command) -> String {
+        match command {
+            Command::FindNeighbour(place) => self.find_neighbour(place),
+            Command::FindShortestRoute(mode, start, destination) => {
+                self.find_shortest_route(mode, start, destination)
+            }
+            Command::Check(mode, nodes) => self.check(mode, &nodes),
+            _ => "Not impl".to_string(),
+            Command::MaxDist => "max dist".to_string(),
+            Command::MaxLink => todo!(),
+            Command::FindDist(_, _) => todo!(),
+            Command::FindRoute(_, _, _) => todo!(),
+        }
+    }
 
-fn find_shortest_route(
-    graph: &Graph<PlaceCopy, Link>,
-    id_map: &HashMap<i32, NodeIndex>,
-    command: Command,
-) -> String {
-    if let Command::FindShortestRoute(mode, start, goal) = command {
-        let start_node = id_map.get(&start).unwrap();
-        let goal_node = id_map.get(&goal).unwrap();
+    fn find_neighbour(&self, id: i32) -> String {
+        let node_id = self.id_map.get(&id).unwrap();
+        let node = self.graph.get_node(*node_id).unwrap();
+
+        let mut output = format!("FindNeighbour {}", node.data.id);
+
+        for neighbour in self.graph.edges(*node_id) {
+            let dest = self.graph.get_node(neighbour.nodes[1]).unwrap();
+            output = format!("{}\n{}", output, dest.data.id);
+        }
+
+        output
+    }
+
+    fn find_shortest_route(&self, mode: TravelMode, start: i32, goal: i32) -> String {
+        let start_node = self.id_map.get(&start).unwrap();
+        let goal_node = self.id_map.get(&goal).unwrap();
 
         let routes = dijkstra(
-            &graph,
+            &self.graph,
             *start_node,
             Some(*goal_node),
             |_| 1,
@@ -77,15 +77,48 @@ fn find_shortest_route(
         }
         nodes.reverse();
 
-        println!("{:?}", nodes);
         for i in nodes {
-            let node = graph.get_node(*i).unwrap();
+            let node = self.graph.get_node(*i).unwrap();
             output = format!("{}\n{}", output, &node.data.to_string());
         }
 
         output
-    } else {
-        panic!();
+    }
+
+    fn check(&self, mode: TravelMode, node_ids: &Vec<i32>) -> String {
+        let indexes: Vec<&usize> = node_ids
+            .into_iter()
+            .map(|x| self.id_map.get(&x).unwrap())
+            .collect();
+
+        let string_ids: Vec<String> = node_ids.into_iter().map(|x| x.to_string()).collect();
+        let mut output = format!("Check {} {}", mode, string_ids.join(" "));
+
+        for i in 0..indexes.len() - 1 {
+            let current_id = *indexes[i];
+            let next_id = *indexes[i + 1];
+
+            let connects = self
+                .graph
+                .edges(current_id)
+                .filter(|x| can_traverse(&mode, &x.data.mode))
+                .any(|x| -> bool {
+                    println! {"{}",next_id};
+                    println! {"{}",x.destination()};
+                    x.destination() == next_id
+                });
+
+            let current_node = self.graph.get_node(current_id).unwrap();
+            let next_node = *self.graph.get_node(next_id).unwrap();
+
+            let outcome = if connects { "PASS" } else { "FAIL" };
+            output = format!(
+                "{}\n{},{},{}",
+                output, current_node.data.id, next_node.data.id, outcome
+            );
+        }
+
+        output
     }
 }
 
@@ -108,6 +141,5 @@ fn can_traverse(mode: &TravelMode, edge_mode: &TravelMode) -> bool {
         }
         TravelMode::Bike => *edge_mode != TravelMode::Foot,
         TravelMode::Foot => true,
-        _ => panic!(),
     }
 }
