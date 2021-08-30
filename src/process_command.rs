@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 
+use geoutils::Location;
+use ordered_float::OrderedFloat;
+
 use crate::{
     dijkstra::dijkstra,
-    graph::{EdgeRef, Graph, NodeIndex},
+    graph::{Edge, EdgeRef, Graph, NodeIndex},
     models::{Command, Link, PlaceCopy, TravelMode},
 };
 
@@ -23,9 +26,9 @@ impl CommandProcessor {
                 self.find_shortest_route(mode, start, destination)
             }
             Command::Check(mode, nodes) => self.check(mode, &nodes),
+            Command::MaxLink => self.max_link(),
             _ => "Not impl".to_string(),
             Command::MaxDist => "max dist".to_string(),
-            Command::MaxLink => todo!(),
             Command::FindDist(_, _) => todo!(),
             Command::FindRoute(_, _, _) => todo!(),
         }
@@ -102,11 +105,7 @@ impl CommandProcessor {
                 .graph
                 .edges(current_id)
                 .filter(|x| can_traverse(&mode, &x.data.mode))
-                .any(|x| -> bool {
-                    println! {"{}",next_id};
-                    println! {"{}",x.destination()};
-                    x.destination() == next_id
-                });
+                .any(|x| x.destination() == next_id);
 
             let current_node = self.graph.get_node(current_id).unwrap();
             let next_node = *self.graph.get_node(next_id).unwrap();
@@ -119,6 +118,34 @@ impl CommandProcessor {
         }
 
         output
+    }
+
+    fn max_link(&self) -> String {
+        let max = self
+            .graph
+            .raw_edges()
+            .iter()
+            .max_by_key(|edge| {
+                let dist = self.edge_to_distance(edge);
+                OrderedFloat(dist)
+            })
+            .unwrap();
+
+        let dist = self.edge_to_distance(max);
+        let a = self.graph.get_node(max.source).unwrap().data.id;
+        let b = self.graph.get_node(max.destination).unwrap().data.id;
+
+        format!("{},{},{}", a, b, dist)
+    }
+
+    fn edge_to_distance(&self, edge: &Edge<Link>) -> f64 {
+        let a = self.graph.get_node(edge.source).unwrap();
+        let b = self.graph.get_node(edge.destination).unwrap();
+
+        let c = Location::new(a.data.latitude, a.data.longitude);
+        let d = Location::new(b.data.latitude, b.data.longitude);
+
+        c.distance_to(&d).unwrap().meters()
     }
 }
 
