@@ -1,6 +1,6 @@
 use learning_graph::models::Link;
 use learning_graph::models::Place;
-use learning_graph::process_command::process;
+use learning_graph::process_command::CommandProcessor;
 use learning_graph::{
     deserialization::{read_commands, read_links, read_places},
     graph::{Graph, NodeIndex},
@@ -19,16 +19,16 @@ fn main() {
 
     let (graph, map) = build_graph(nodes, links);
 
+    let processor = CommandProcessor::new(graph, map);
     let commands = read_commands(command_path).unwrap();
 
     println!("{:?}", commands);
 
-    let results: Vec<String> = commands
-        .into_iter()
-        .map(|x| process(&graph, &map, x))
-        .collect();
+    let results: Vec<String> = commands.into_iter().map(|x| processor.process(x)).collect();
 
-    println!("{:?}", results);
+    for result in results {
+        println!("{}", result);
+    }
 }
 
 fn build_graph(
