@@ -52,8 +52,8 @@ impl Display for Place {
 #[derive(Clone, Copy, Debug)]
 pub struct PlaceCopy {
     pub id: i32,
-    latitude: f32,
-    longitude: f32,
+    pub latitude: f32,
+    pub longitude: f32,
 }
 
 impl PlaceCopy {
