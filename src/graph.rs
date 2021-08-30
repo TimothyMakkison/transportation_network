@@ -51,13 +51,13 @@ impl<N, E> Graph<N, E> {
         &mut self,
         source_index: NodeIndex,
         dest_index: NodeIndex,
-        weight: E,
+        data: E,
     ) -> EdgeIndex {
         let (source_node, destination_node) =
             Graph::<N, E>::get_nodes(&mut self.nodes, source_index, dest_index);
 
         let edge = Edge {
-            data: weight,
+            data,
             source: source_index,
             destination: dest_index,
             outgoing: source_node.outgoing,
