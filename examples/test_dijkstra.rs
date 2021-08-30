@@ -48,7 +48,7 @@ fn test_disktra() {
 
     graph.add_edge(node_b, node_c, 5);
 
-    let result = dijkstra(graph, node_a, None, |x| *x, |_| true);
+    let result = dijkstra(&graph, node_a, None, |x| *x, |_| true);
 
     let expected = [
         (0, (0, 0)),
