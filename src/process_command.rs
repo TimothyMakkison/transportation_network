@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use geoutils::Location;
 use ordered_float::OrderedFloat;
 
 use crate::{
@@ -135,18 +134,24 @@ impl CommandProcessor {
         let a = self.graph.get_node(max.source).unwrap().data.id;
         let b = self.graph.get_node(max.destination).unwrap().data.id;
 
-        format!("{},{},{:.1}", a, b, dist / 1000.0)
+        format!("{},{},{:.1}", a, b, dist)
     }
 
     fn find_distance(&self, a: i32, b: i32) -> String {
         let node_a = self.index_to_node(a);
         let node_b = self.index_to_node(b);
 
-        let c = Location::new(node_a.data.latitude, node_a.data.longitude);
-        let d = Location::new(node_b.data.latitude, node_b.data.longitude);
-
-        let dist = c.distance_to(&d).unwrap().meters()/1000.0;
+        let dist = self.distance(node_a, node_b);
         format!("{},{},{:.3}", node_a.data.name, node_b.data.name, dist)
+    }
+
+    fn distance(&self, a: &Node<Place>, b: &Node<Place>) -> f64 {
+        let dx = a.data.eastings - b.data.eastings;
+        let dy = a.data.northings - b.data.northings;
+
+        let dist = (dx * dx + dy * dy).sqrt();
+
+        dist / 1000.0
     }
 
     fn index_to_node(&self, id: i32) -> &Node<Place> {
@@ -158,10 +163,7 @@ impl CommandProcessor {
         let a = self.graph.get_node(edge.source).unwrap();
         let b = self.graph.get_node(edge.destination).unwrap();
 
-        let c = Location::new(a.data.latitude, a.data.longitude);
-        let d = Location::new(b.data.latitude, b.data.longitude);
-
-        c.distance_to(&d).unwrap().meters()
+        self.distance(a, b)
     }
 }
 
