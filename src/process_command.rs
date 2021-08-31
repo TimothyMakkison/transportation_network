@@ -27,9 +27,9 @@ impl CommandProcessor {
             }
             Command::Check(mode, nodes) => self.check(mode, &nodes),
             Command::MaxLink => self.max_link(),
+            Command::FindDist(a, b) => self.find_distance(a, b),
             _ => "Not impl".to_string(),
             Command::MaxDist => "max dist".to_string(),
-            Command::FindDist(_, _) => todo!(),
             Command::FindRoute(_, _, _) => todo!(),
         }
     }
@@ -138,16 +138,16 @@ impl CommandProcessor {
         format!("{},{},{:.1}", a, b, dist / 1000.0)
     }
 
-    // fn find_distance(&self, a: i32, b: i32) -> String {
-    //     let node_a = self.index_to_node(a);
-    //     let node_b = self.index_to_node(b);
+    fn find_distance(&self, a: i32, b: i32) -> String {
+        let node_a = self.index_to_node(a);
+        let node_b = self.index_to_node(b);
 
-    //     let c = Location::new(node_a.data.latitude, node_a.data.longitude);
-    //     let d = Location::new(node_b.data.latitude, node_b.data.longitude);
+        let c = Location::new(node_a.data.latitude, node_a.data.longitude);
+        let d = Location::new(node_b.data.latitude, node_b.data.longitude);
 
-    //     let dist = c.distance_to(&d).unwrap().meters();
-    //     format!
-    // }
+        let dist = c.distance_to(&d).unwrap().meters()/1000.0;
+        format!("{},{},{:.3}", node_a.data.name, node_b.data.name, dist)
+    }
 
     fn index_to_node(&self, id: i32) -> &Node<Place> {
         let index = self.id_map.get(&id).unwrap();
