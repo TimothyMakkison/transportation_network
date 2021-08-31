@@ -3,7 +3,7 @@ use std::fs;
 use csv::ReaderBuilder;
 
 use crate::{
-    models::{Command, Link, Place},
+    models::{Command, Link, Place, PlaceDto},
     parser::parse_command,
 };
 
@@ -15,8 +15,9 @@ pub fn read_places(path: &str) -> Vec<Place> {
 
     let mut collection = vec![];
     for result in rdr.deserialize() {
-        let record: Place = result.unwrap();
-        collection.push(record);
+        let record: PlaceDto = result.unwrap();
+
+        collection.push(record.into_place());
     }
     collection
 }
