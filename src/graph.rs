@@ -7,12 +7,13 @@ pub struct Node<N> {
     incoming: EdgeIndex,
 }
 
+//TODO convert to two arrays and add functions
 #[derive(Clone, Copy, Debug)]
 pub struct Edge<E> {
     data: E,
 
-    source: NodeIndex,
-    destination: NodeIndex,
+    pub source: NodeIndex,
+    pub destination: NodeIndex,
 
     outgoing: EdgeIndex,
     incoming: EdgeIndex,
@@ -94,6 +95,10 @@ impl<N, E> Graph<N, E> {
 
     pub fn raw_edges(&self) -> &[Edge<E>] {
         &self.edges
+    }
+
+    pub fn is_adjacent(&self, a: NodeIndex, b: NodeIndex) -> bool {
+        self.edges(a).any(|edge| edge.destination() == b)
     }
 
     fn get_nodes(
