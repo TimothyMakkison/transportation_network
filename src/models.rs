@@ -28,8 +28,8 @@ pub struct Link {
 pub struct Place {
     pub name: String,
     pub id: i32,
-    latitude: f32,
-    longitude: f32,
+    pub latitude: f32,
+    pub longitude: f32,
 }
 
 impl Place {
@@ -44,29 +44,6 @@ impl Place {
 }
 
 impl Display for Place {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct PlaceCopy {
-    pub id: i32,
-    pub latitude: f32,
-    pub longitude: f32,
-}
-
-impl PlaceCopy {
-    pub fn from_place(source: Place) -> PlaceCopy {
-        PlaceCopy {
-            id: source.id,
-            latitude: source.latitude,
-            longitude: source.latitude,
-        }
-    }
-}
-
-impl Display for PlaceCopy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }

@@ -5,17 +5,17 @@ use ordered_float::OrderedFloat;
 
 use crate::{
     dijkstra::dijkstra,
-    graph::{Edge, EdgeRef, Graph, NodeIndex},
-    models::{Command, Link, PlaceCopy, TravelMode},
+    graph::{Edge, EdgeRef, Graph, Node, NodeIndex},
+    models::{Command, Link, Place, TravelMode},
 };
 
 pub struct CommandProcessor {
-    graph: Graph<PlaceCopy, Link>,
+    graph: Graph<Place, Link>,
     id_map: HashMap<i32, NodeIndex>,
 }
 
 impl CommandProcessor {
-    pub fn new(graph: Graph<PlaceCopy, Link>, id_map: HashMap<i32, NodeIndex>) -> Self {
+    pub fn new(graph: Graph<Place, Link>, id_map: HashMap<i32, NodeIndex>) -> Self {
         Self { graph, id_map }
     }
 
@@ -108,7 +108,7 @@ impl CommandProcessor {
                 .any(|x| x.destination() == next_id);
 
             let current_node = self.graph.get_node(current_id).unwrap();
-            let next_node = *self.graph.get_node(next_id).unwrap();
+            let next_node = self.graph.get_node(next_id).unwrap();
 
             let outcome = if connects { "PASS" } else { "FAIL" };
             output = format!(
@@ -135,7 +135,23 @@ impl CommandProcessor {
         let a = self.graph.get_node(max.source).unwrap().data.id;
         let b = self.graph.get_node(max.destination).unwrap().data.id;
 
-        format!("{},{},{}", a, b, dist)
+        format!("{},{},{:.1}", a, b, dist / 1000.0)
+    }
+
+    // fn find_distance(&self, a: i32, b: i32) -> String {
+    //     let node_a = self.index_to_node(a);
+    //     let node_b = self.index_to_node(b);
+
+    //     let c = Location::new(node_a.data.latitude, node_a.data.longitude);
+    //     let d = Location::new(node_b.data.latitude, node_b.data.longitude);
+
+    //     let dist = c.distance_to(&d).unwrap().meters();
+    //     format!
+    // }
+
+    fn index_to_node(&self, id: i32) -> &Node<Place> {
+        let index = self.id_map.get(&id).unwrap();
+        self.graph.get_node(*index).unwrap()
     }
 
     fn edge_to_distance(&self, edge: &Edge<Link>) -> f64 {

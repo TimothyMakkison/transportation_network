@@ -4,7 +4,6 @@ use learning_graph::process_command::CommandProcessor;
 use learning_graph::{
     deserialization::{read_commands, read_links, read_places},
     graph::{Graph, NodeIndex},
-    models::PlaceCopy,
 };
 
 use std::collections::HashMap;
@@ -20,9 +19,9 @@ fn main() {
     let (graph, map) = build_graph(nodes, links);
 
     let processor = CommandProcessor::new(graph, map);
-    let commands = read_commands(command_path).unwrap();
 
-    println!("{:?}", commands);
+    let commands = read_commands(command_path).unwrap();
+    // println!("{:?}", commands);
 
     let results: Vec<String> = commands.into_iter().map(|x| processor.process(x)).collect();
 
@@ -34,13 +33,13 @@ fn main() {
 fn build_graph(
     nodes: Vec<Place>,
     edges: Vec<Link>,
-) -> (Graph<PlaceCopy, Link>, HashMap<i32, NodeIndex>) {
+) -> (Graph<Place, Link>, HashMap<i32, NodeIndex>) {
     let mut graph = Graph::new();
     let mut map = HashMap::new();
 
     for node in nodes {
         let id = node.id;
-        let node_index = graph.add_node(PlaceCopy::from_place(node));
+        let node_index = graph.add_node(node);
         map.insert(id, node_index);
     }
 
