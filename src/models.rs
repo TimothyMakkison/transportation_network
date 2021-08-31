@@ -1,3 +1,4 @@
+use coord_transforms::{geo::ll2utm, prelude::Vector2, structs::geo_ellipsoid};
 use serde::Deserialize;
 use std::fmt::Display;
 
@@ -25,20 +26,66 @@ pub struct Link {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct PlaceDto {
+    pub name: String,
+    pub id: i32,
+    pub latitude: f64,
+    pub longitude: f64,
+}
+
+impl PlaceDto {
+    pub fn into_place(self) -> Place {
+        let utm_grid = self.convert_to_grid();
+
+        Place::new(
+            self.name,
+            self.id,
+            self.latitude,
+            self.longitude,
+            utm_grid.get_northing(),
+            utm_grid.get_easting(),
+        )
+    }
+
+    fn convert_to_grid(&self) -> coord_transforms::structs::utm_grid::utm_grid {
+        let ellipsoid = geo_ellipsoid::geo_ellipsoid::new(
+            geo_ellipsoid::WGS84_SEMI_MAJOR_AXIS_METERS,
+            geo_ellipsoid::WGS84_FLATTENING,
+        );
+        let lat: f64 = self.latitude;
+        let long: f64 = self.longitude;
+        let ll_vec: Vector2<f64> = Vector2::new(lat.to_radians(), long.to_radians());
+        let utm_grid = ll2utm(&ll_vec, &ellipsoid);
+        utm_grid
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct Place {
     pub name: String,
     pub id: i32,
-    pub latitude: f32,
-    pub longitude: f32,
+    pub latitude: f64,
+    pub longitude: f64,
+    pub northings: f64,
+    pub eastings: f64,
 }
 
 impl Place {
-    pub fn new(name: String, id: i32, latitude: f32, longitude: f32) -> Self {
+    pub fn new(
+        name: String,
+        id: i32,
+        latitude: f64,
+        longitude: f64,
+        northings: f64,
+        eastings: f64,
+    ) -> Self {
         Self {
             name,
             id,
             latitude,
             longitude,
+            northings,
+            eastings,
         }
     }
 }
