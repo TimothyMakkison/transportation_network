@@ -4,6 +4,7 @@ use itertools::Itertools;
 use ordered_float::OrderedFloat;
 
 use crate::{
+    algorithms::find_path,
     convex_hull,
     dijkstra::dijkstra,
     graph::{Edge, EdgeRef, Graph, Node, NodeIndex},
@@ -30,8 +31,8 @@ impl CommandProcessor {
             Command::MaxLink => self.max_link(),
             Command::FindDist(a, b) => self.find_distance(a, b),
             Command::MaxDist => self.max_dist(),
-            _ => "Not impl".to_string(),
-            Command::FindRoute(_, _, _) => todo!(),
+            Command::FindRoute(mode, start, dest) => self.find_route(mode, start, dest),
+            _ => panic!("Unknown command"),
         }
     }
 
@@ -194,6 +195,51 @@ impl CommandProcessor {
 
         let dist = max_dist.sqrt() / 1000.0;
         format!("{}, {}, {}", pair.0, pair.1, dist)
+    }
+
+    fn find_route(&self, mode: TravelMode, start: i32, goal: i32) -> String {
+        let start_node = self.id_map.get(&start).unwrap();
+        let goal_node = self.id_map.get(&goal).unwrap();
+
+        let routes = find_path(
+            &self.graph,
+            *start_node,
+            *goal_node,
+            |a, b| {
+                let dx = a.eastings - b.eastings;
+                let dy = a.northings - b.northings;
+
+                dx * dx + dy * dy
+            },
+            |x| can_traverse(&mode, &x.mode),
+        );
+
+        let mut nodes = vec![goal_node];
+        let mut curr = goal_node;
+
+        let mut output = format!("FindRoute {} {} {}", mode, start, goal);
+
+        while curr != start_node {
+            match routes.get(curr) {
+                Some(pair) => {
+                    curr = &pair.1;
+                    nodes.push(curr);
+                }
+                None => {
+                    output = format!("{} \nFail", output);
+
+                    return output;
+                }
+            }
+        }
+        nodes.reverse();
+
+        for i in nodes {
+            let node = self.graph.get_node(*i).unwrap();
+            output = format!("{}\n{}", output, &node.data.to_string());
+        }
+
+        output
     }
 }
 

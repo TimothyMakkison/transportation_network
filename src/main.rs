@@ -1,3 +1,4 @@
+use learning_graph::algorithms;
 use learning_graph::models::Link;
 use learning_graph::models::Place;
 use learning_graph::process_command::CommandProcessor;
@@ -26,7 +27,7 @@ fn main() {
     let results: Vec<String> = commands.into_iter().map(|x| processor.process(x)).collect();
 
     for result in results {
-        println!("{}", result);
+        println!("{}\n", result);
     }
 }
 
