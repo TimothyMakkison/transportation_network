@@ -32,7 +32,6 @@ impl CommandProcessor {
             Command::FindDist(a, b) => self.find_distance(a, b),
             Command::MaxDist => self.max_dist(),
             Command::FindRoute(mode, start, dest) => self.find_route(mode, start, dest),
-            _ => panic!("Unknown command"),
         }
     }
 
