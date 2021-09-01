@@ -40,8 +40,6 @@ impl PlaceDto {
         Place::new(
             self.name,
             self.id,
-            self.latitude,
-            self.longitude,
             utm_grid.get_northing(),
             utm_grid.get_easting(),
         )
@@ -64,26 +62,15 @@ impl PlaceDto {
 pub struct Place {
     pub name: String,
     pub id: i32,
-    pub latitude: f64,
-    pub longitude: f64,
     pub northings: f64,
     pub eastings: f64,
 }
 
 impl Place {
-    pub fn new(
-        name: String,
-        id: i32,
-        latitude: f64,
-        longitude: f64,
-        northings: f64,
-        eastings: f64,
-    ) -> Self {
+    pub fn new(name: String, id: i32, northings: f64, eastings: f64) -> Self {
         Self {
             name,
             id,
-            latitude,
-            longitude,
             northings,
             eastings,
         }
