@@ -1,8 +1,8 @@
 use learning_graph::algorithms::graph::{Graph, NodeIndex};
-use learning_graph::deserialization::{read_commands, read_links, read_places};
 use learning_graph::models::Link;
 use learning_graph::models::Place;
 use learning_graph::process_command::CommandProcessor;
+use learning_graph::startup::deserialization::{read_commands, read_links, read_places};
 
 use std::collections::HashMap;
 
@@ -19,7 +19,6 @@ fn main() {
     let processor = CommandProcessor::new(graph, map);
 
     let commands = read_commands(command_path).unwrap();
-    // println!("{:?}", commands);
 
     let results: Vec<String> = commands.into_iter().map(|x| processor.process(x)).collect();
 

@@ -4,7 +4,7 @@ use csv::ReaderBuilder;
 
 use crate::{
     models::{Command, Link, Place, PlaceDto},
-    parser::parse_command,
+    startup::parser::parse_command,
 };
 
 pub fn read_places(path: &str) -> Vec<Place> {
