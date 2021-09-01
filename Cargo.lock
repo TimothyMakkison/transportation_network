@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 version = 3
 
-tab[[package]]
+[[package]]
 name = "approx"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
