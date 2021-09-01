@@ -1,6 +1,6 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
-use crate::graph::{EdgeRef, Graph, NodeIndex};
+// use crate::graph::{EdgeRef, Graph, NodeIndex};
 
 pub fn find_path<N, E, T, TGetCost, TCost>(
     graph: &Graph<N, E>,
@@ -56,6 +56,8 @@ where
     scores
 }
 use std::cmp::Ordering;
+
+use super::graph::{EdgeRef, Graph, NodeIndex};
 
 /// `MinScored<K, T>` holds a score `K` and a scored object `T` in
 /// a pair for use with a `BinaryHeap`.

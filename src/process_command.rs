@@ -4,10 +4,10 @@ use itertools::Itertools;
 use ordered_float::OrderedFloat;
 
 use crate::{
-    algorithms::find_path,
-    convex_hull,
-    dijkstra::dijkstra,
-    graph::{Edge, EdgeRef, Graph, Node, NodeIndex},
+    algorithms::{
+        convex_hull, dijkstra, find_path,
+        graph::{Edge, EdgeRef, Graph, Node, NodeIndex},
+    },
     models::{Command, Link, Place, TravelMode},
 };
 
@@ -177,7 +177,7 @@ impl CommandProcessor {
             .map(|place| place.data.clone())
             .collect();
 
-        let hull = &convex_hull::convex_hull(places.as_slice());
+        let hull = &convex_hull(places.as_slice());
 
         let mut pair = (&hull[0], &hull[1]);
         let mut max_dist = -1.0;

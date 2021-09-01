@@ -1,8 +1,6 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::ops::Add;
 
-use crate::graph::{EdgeRef, Graph, NodeIndex};
-
 pub fn dijkstra<N, E, T, S, C>(
     graph: &Graph<N, E>,
     start: NodeIndex,
@@ -62,6 +60,8 @@ where
     scores
 }
 use std::cmp::Ordering;
+
+use super::graph::{EdgeRef, Graph, NodeIndex};
 
 /// `MinScored<K, T>` holds a score `K` and a scored object `T` in
 /// a pair for use with a `BinaryHeap`.

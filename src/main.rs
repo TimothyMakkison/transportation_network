@@ -1,11 +1,8 @@
-use learning_graph::algorithms;
+use learning_graph::algorithms::graph::{Graph, NodeIndex};
+use learning_graph::deserialization::{read_commands, read_links, read_places};
 use learning_graph::models::Link;
 use learning_graph::models::Place;
 use learning_graph::process_command::CommandProcessor;
-use learning_graph::{
-    deserialization::{read_commands, read_links, read_places},
-    graph::{Graph, NodeIndex},
-};
 
 use std::collections::HashMap;
 
