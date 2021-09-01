@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
+use itertools::Itertools;
 use ordered_float::OrderedFloat;
 
 use crate::{
+    convex_hull,
     dijkstra::dijkstra,
     graph::{Edge, EdgeRef, Graph, Node, NodeIndex},
     models::{Command, Link, Place, TravelMode},
@@ -27,8 +29,8 @@ impl CommandProcessor {
             Command::Check(mode, nodes) => self.check(mode, &nodes),
             Command::MaxLink => self.max_link(),
             Command::FindDist(a, b) => self.find_distance(a, b),
+            Command::MaxDist => self.max_dist(),
             _ => "Not impl".to_string(),
-            Command::MaxDist => "max dist".to_string(),
             Command::FindRoute(_, _, _) => todo!(),
         }
     }
@@ -164,6 +166,34 @@ impl CommandProcessor {
         let b = self.graph.get_node(edge.destination).unwrap();
 
         self.distance(a, b)
+    }
+
+    fn max_dist(&self) -> String {
+        let places: Vec<Place> = self
+            .graph
+            .raw_nodes()
+            .into_iter()
+            .map(|place| place.data.clone())
+            .collect();
+
+        let hull = &convex_hull::convex_hull(places.as_slice());
+
+        let mut pair = (&hull[0], &hull[1]);
+        let mut max_dist = -1.0;
+
+        for (a, b) in hull.into_iter().tuple_combinations() {
+            let dx = a.eastings - b.eastings;
+            let dy = a.northings - b.northings;
+
+            let dist = dx * dx + dy * dy;
+            if dist > max_dist {
+                max_dist = dist;
+                pair = (a, b);
+            }
+        }
+
+        let dist = max_dist.sqrt() / 1000.0;
+        format!("{}, {}, {}", pair.0, pair.1, dist)
     }
 }
 

@@ -60,7 +60,7 @@ impl PlaceDto {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct Place {
     pub name: String,
     pub id: i32,
