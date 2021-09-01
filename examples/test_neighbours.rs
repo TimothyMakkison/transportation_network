@@ -1,6 +1,6 @@
-extern crate learning_graph;
+use learning_graph::algorithms::graph::Graph;
 
-use learning_graph::graph::Graph;
+extern crate learning_graph;
 
 fn main() {
     let mut graph = Graph::new();

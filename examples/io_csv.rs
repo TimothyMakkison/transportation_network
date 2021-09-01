@@ -1,4 +1,4 @@
-use learning_graph::deserialization::{read_links, read_places};
+use learning_graph::startup::deserialization::{read_links, read_places};
 
 fn main() {
     let places_path = "Places.csv";

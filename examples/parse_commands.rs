@@ -1,6 +1,6 @@
-use learning_graph::parser::parse_command;
-
 use std::fs::{self};
+
+use learning_graph::startup::parser::parse_command;
 
 fn main() {
     let contents =
