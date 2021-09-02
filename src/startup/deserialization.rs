@@ -37,13 +37,18 @@ pub fn read_links(path: &str) -> Vec<Link> {
     collection
 }
 
-pub fn read_commands(path: &str) -> Result<Vec<Command>, &'static str> {
+pub fn read_commands(path: &str) -> Result<Vec<Command>, String> {
     let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
 
     let mut commands = vec![];
     for line in contents.lines() {
         let parsed = parse_command(line.as_bytes());
-        commands.push(parsed.unwrap().1);
+        match parsed {
+            Ok(command) => {
+                commands.push(command.1);
+            }
+            Err(_) => {}
+        }
     }
     return Ok(commands);
 }
