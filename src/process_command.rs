@@ -24,16 +24,59 @@ impl CommandProcessor {
 
     pub fn process(&self, command: Command) -> String {
         match command {
+            Command::MaxDist => self.max_dist(),
+            Command::MaxLink => self.max_link(),
+            Command::FindDist(a, b) => self.find_distance(a, b),
             Command::FindNeighbour(place) => self.find_neighbour(place),
+            Command::Check(mode, nodes) => self.check(mode, &nodes),
             Command::FindShortestRoute(mode, start, destination) => {
                 self.find_shortest_route(mode, start, destination)
             }
-            Command::Check(mode, nodes) => self.check(mode, &nodes),
-            Command::MaxLink => self.max_link(),
-            Command::FindDist(a, b) => self.find_distance(a, b),
-            Command::MaxDist => self.max_dist(),
             Command::FindRoute(mode, start, dest) => self.find_route(mode, start, dest),
         }
+    }
+
+    fn max_dist(&self) -> String {
+        let places: Vec<Place> = self
+            .graph
+            .raw_nodes()
+            .into_iter()
+            .map(|place| place.data.clone())
+            .collect();
+
+        let hull = &convex_hull(places.as_slice());
+
+        let mut pair = (&hull[0], &hull[1]);
+        let mut max_dist = -1.0;
+
+        for (a, b) in hull.into_iter().tuple_combinations() {
+            let dist = self.distance(a, b);
+            if dist > max_dist {
+                max_dist = dist;
+                pair = (a, b);
+            }
+        }
+
+        let dist = max_dist.sqrt() / 1000.0;
+        format!("MaxDist\n{}, {}, {}", pair.0, pair.1, dist)
+    }
+
+    fn max_link(&self) -> String {
+        let max = self
+            .graph
+            .raw_edges()
+            .iter()
+            .max_by_key(|edge| {
+                let dist = self.edge_to_distance(edge);
+                OrderedFloat(dist)
+            })
+            .unwrap();
+
+        let dist = self.edge_to_distance(max);
+        let a = self.graph.get_node(max.source).unwrap().data.id;
+        let b = self.graph.get_node(max.destination).unwrap().data.id;
+
+        format!("MaxLink\n{},{},{:.1}", a, b, dist)
     }
 
     fn find_neighbour(&self, id: i32) -> String {
@@ -45,6 +88,38 @@ impl CommandProcessor {
         for neighbour in self.graph.edges(*node_id) {
             let dest = self.graph.get_node(neighbour.nodes[1]).unwrap();
             output = format!("{}\n{}", output, dest.data.id);
+        }
+
+        output
+    }
+
+    fn check(&self, mode: TravelMode, node_ids: &Vec<i32>) -> String {
+        let indexes: Vec<&usize> = node_ids
+            .into_iter()
+            .map(|x| self.id_map.get(&x).unwrap())
+            .collect();
+
+        let string_ids: Vec<String> = node_ids.into_iter().map(|x| x.to_string()).collect();
+        let mut output = format!("Check {} {}", mode, string_ids.join(" "));
+
+        for i in 0..indexes.len() - 1 {
+            let current_id = *indexes[i];
+            let next_id = *indexes[i + 1];
+
+            let connects = self
+                .graph
+                .edges(current_id)
+                .filter(|x| can_traverse(&mode, &x.data.mode))
+                .any(|x| x.destination() == next_id);
+
+            let current_node = self.graph.get_node(current_id).unwrap();
+            let next_node = self.graph.get_node(next_id).unwrap();
+
+            let outcome = if connects { "PASS" } else { "FAIL" };
+            output = format!(
+                "{}\n{},{},{}",
+                output, current_node.data.id, next_node.data.id, outcome
+            );
         }
 
         output
@@ -90,70 +165,20 @@ impl CommandProcessor {
         output
     }
 
-    fn check(&self, mode: TravelMode, node_ids: &Vec<i32>) -> String {
-        let indexes: Vec<&usize> = node_ids
-            .into_iter()
-            .map(|x| self.id_map.get(&x).unwrap())
-            .collect();
-
-        let string_ids: Vec<String> = node_ids.into_iter().map(|x| x.to_string()).collect();
-        let mut output = format!("Check {} {}", mode, string_ids.join(" "));
-
-        for i in 0..indexes.len() - 1 {
-            let current_id = *indexes[i];
-            let next_id = *indexes[i + 1];
-
-            let connects = self
-                .graph
-                .edges(current_id)
-                .filter(|x| can_traverse(&mode, &x.data.mode))
-                .any(|x| x.destination() == next_id);
-
-            let current_node = self.graph.get_node(current_id).unwrap();
-            let next_node = self.graph.get_node(next_id).unwrap();
-
-            let outcome = if connects { "PASS" } else { "FAIL" };
-            output = format!(
-                "{}\n{},{},{}",
-                output, current_node.data.id, next_node.data.id, outcome
-            );
-        }
-
-        output
-    }
-
-    fn max_link(&self) -> String {
-        let max = self
-            .graph
-            .raw_edges()
-            .iter()
-            .max_by_key(|edge| {
-                let dist = self.edge_to_distance(edge);
-                OrderedFloat(dist)
-            })
-            .unwrap();
-
-        let dist = self.edge_to_distance(max);
-        let a = self.graph.get_node(max.source).unwrap().data.id;
-        let b = self.graph.get_node(max.destination).unwrap().data.id;
-
-        format!("MaxLink\n{},{},{:.1}", a, b, dist)
-    }
-
     fn find_distance(&self, a: i32, b: i32) -> String {
         let node_a = self.index_to_node(a);
         let node_b = self.index_to_node(b);
 
-        let dist = self.distance(node_a, node_b);
+        let dist = self.distance(&node_a.data, &node_b.data);
         format!(
             "FindDist\n{},{},{:.3}",
             node_a.data.name, node_b.data.name, dist
         )
     }
 
-    fn distance(&self, a: &Node<Place>, b: &Node<Place>) -> f64 {
-        let dx = a.data.eastings - b.data.eastings;
-        let dy = a.data.northings - b.data.northings;
+    fn distance(&self, a: &Place, b: &Place) -> f64 {
+        let dx = a.eastings - b.eastings;
+        let dy = a.northings - b.northings;
 
         let dist = (dx * dx + dy * dy).sqrt();
 
@@ -169,35 +194,7 @@ impl CommandProcessor {
         let a = self.graph.get_node(edge.source).unwrap();
         let b = self.graph.get_node(edge.destination).unwrap();
 
-        self.distance(a, b)
-    }
-
-    fn max_dist(&self) -> String {
-        let places: Vec<Place> = self
-            .graph
-            .raw_nodes()
-            .into_iter()
-            .map(|place| place.data.clone())
-            .collect();
-
-        let hull = &convex_hull(places.as_slice());
-
-        let mut pair = (&hull[0], &hull[1]);
-        let mut max_dist = -1.0;
-
-        for (a, b) in hull.into_iter().tuple_combinations() {
-            let dx = a.eastings - b.eastings;
-            let dy = a.northings - b.northings;
-
-            let dist = dx * dx + dy * dy;
-            if dist > max_dist {
-                max_dist = dist;
-                pair = (a, b);
-            }
-        }
-
-        let dist = max_dist.sqrt() / 1000.0;
-        format!("MaxDist\n{}, {}, {}", pair.0, pair.1, dist)
+        self.distance(&a.data, &b.data)
     }
 
     fn find_route(&self, mode: TravelMode, start: i32, goal: i32) -> String {
