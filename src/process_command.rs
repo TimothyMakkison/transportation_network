@@ -11,6 +11,7 @@ use crate::{
     models::{Command, Link, Place, TravelMode},
 };
 
+#[derive(Clone)]
 pub struct CommandProcessor {
     graph: Graph<Place, Link>,
     id_map: HashMap<i32, NodeIndex>,

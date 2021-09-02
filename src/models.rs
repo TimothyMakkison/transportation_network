@@ -83,7 +83,7 @@ impl Display for Place {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Command {
     MaxDist,
     MaxLink,
