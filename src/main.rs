@@ -1,6 +1,6 @@
 use learning_graph::process_command::CommandProcessor;
 use learning_graph::startup::deserialization::{read_commands, read_links, read_places};
-use learning_graph::startup::graph_builder::{self, build};
+use learning_graph::startup::graph_builder::{self};
 
 fn main() {
     let places_path = "Places.csv";
