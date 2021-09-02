@@ -137,7 +137,7 @@ impl CommandProcessor {
         let a = self.graph.get_node(max.source).unwrap().data.id;
         let b = self.graph.get_node(max.destination).unwrap().data.id;
 
-        format!("{},{},{:.1}", a, b, dist)
+        format!("MaxLink\n{},{},{:.1}", a, b, dist)
     }
 
     fn find_distance(&self, a: i32, b: i32) -> String {
@@ -145,7 +145,10 @@ impl CommandProcessor {
         let node_b = self.index_to_node(b);
 
         let dist = self.distance(node_a, node_b);
-        format!("{},{},{:.3}", node_a.data.name, node_b.data.name, dist)
+        format!(
+            "FindDist\n{},{},{:.3}",
+            node_a.data.name, node_b.data.name, dist
+        )
     }
 
     fn distance(&self, a: &Node<Place>, b: &Node<Place>) -> f64 {
@@ -194,7 +197,7 @@ impl CommandProcessor {
         }
 
         let dist = max_dist.sqrt() / 1000.0;
-        format!("{}, {}, {}", pair.0, pair.1, dist)
+        format!("MaxDist\n{}, {}, {}", pair.0, pair.1, dist)
     }
 
     fn find_route(&self, mode: TravelMode, start: i32, goal: i32) -> String {
