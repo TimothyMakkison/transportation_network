@@ -1,15 +1,12 @@
 use std::fmt;
 
-use crate::{
-    algorithms::graph::Graph,
-    models::{Link, Place, TravelMode},
-};
+use crate::algorithms::graph::Graph;
 
 pub struct Dot<'a, N, E> {
     graph: Graph<N, E>,
     node_func: &'a dyn Fn(&mut fmt::Formatter, &N) -> fmt::Result,
     edge_func: &'a dyn Fn(&mut fmt::Formatter, &E) -> fmt::Result,
-    subgraphs: &'a [&'a dyn Fn(&mut fmt::Formatter, &E) -> fmt::Result],
+    subgraphs: &'a [&'a dyn Fn(&mut fmt::Formatter) -> fmt::Result],
 }
 
 impl<'a, N, E> Dot<'a, N, E> {
@@ -17,7 +14,7 @@ impl<'a, N, E> Dot<'a, N, E> {
         graph: Graph<N, E>,
         node_func: &'a dyn Fn(&mut fmt::Formatter, &N) -> fmt::Result,
         edge_func: &'a dyn Fn(&mut fmt::Formatter, &E) -> fmt::Result,
-        subgraphs: &'a [&'a dyn Fn(&mut fmt::Formatter, &E) -> fmt::Result],
+        subgraphs: &'a [&'a dyn Fn(&mut fmt::Formatter) -> fmt::Result],
     ) -> Self {
         Self {
             graph,
@@ -44,6 +41,10 @@ impl<'a, N, E> fmt::Display for Dot<'a, N, E> {
             // edge.data.fmt(f)?;
             (self.edge_func)(f, &edge.data)?;
             write!(f, "]\n")?;
+        }
+
+        for sub_graph in self.subgraphs {
+            (sub_graph)(f)?;
         }
 
         writeln!(f, "}}")?;
