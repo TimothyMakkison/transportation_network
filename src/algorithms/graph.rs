@@ -10,7 +10,7 @@ pub struct Node<N> {
 //TODO convert to two arrays and add functions
 #[derive(Clone, Copy, Debug)]
 pub struct Edge<E> {
-    data: E,
+    pub data: E,
 
     pub source: NodeIndex,
     pub destination: NodeIndex,
