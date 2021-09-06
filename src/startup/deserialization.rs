@@ -15,7 +15,11 @@ pub fn read_places(path: &str) -> Vec<Place> {
 
     let mut collection = vec![];
     for result in rdr.deserialize() {
-        let record: PlaceDto = result.unwrap();
+        let mut record: PlaceDto = result.unwrap();
+
+        // TODO. Have to subtract 1 such that all places all have a longitude of less than 0.
+        // Otherwise the few places with a positive longitude will have highly inaccurate eastings.
+        record.longitude -= 1.0;
 
         collection.push(record.into_place());
     }
