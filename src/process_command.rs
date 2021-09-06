@@ -29,8 +29,8 @@ impl CommandProcessor {
             Command::FindDist(a, b) => self.find_distance(a, b),
             Command::FindNeighbour(place) => self.find_neighbour(place),
             Command::Check(mode, nodes) => self.check(mode, &nodes),
-            Command::FindShortestRoute(mode, start, destination) => {
-                self.find_shortest_route(mode, start, destination)
+            Command::FindShortestRoute(mode, start, dest) => {
+                self.find_shortest_route(mode, start, dest)
             }
             Command::FindRoute(mode, start, dest) => self.find_route(mode, start, dest),
         }
