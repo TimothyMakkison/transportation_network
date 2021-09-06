@@ -2,7 +2,7 @@ use coord_transforms::{geo::ll2utm, prelude::Vector2, structs::geo_ellipsoid};
 use serde::Deserialize;
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq, Deserialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Deserialize, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 pub enum TravelMode {
     Foot,
     Bike,
