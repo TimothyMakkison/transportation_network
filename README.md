@@ -24,12 +24,23 @@ containing a pair of place Id's and the type of transportation. [Commands.txt](h
 
 ### Links.csv
 |Place a|Place b| Transport Mode|
-| :---:   | :-: | :-: | 
+| :-:   | :-: | :-: | 
 |8441694|	061761	|Bus|
 |8441694	|10381699	|Car|
 |8611522	|8631524	|Car|
 |8611522|	11251704	|Rail|
 
+### Modes
+Commands specify what type of travel mode is used, this determines what links are allowed to be traversed as follows.
+ie: Foot can use any link, whereas rail and ship may only go on their respect lines.
+|     |Foot Route|Bike Route|Car Route|Bus Route|Ship Route|Rail Route|
+| :-:  | :-:  | :-:  | :-:  | :-:  | :-:  | :-:  |
+|Foot Mode| X  | X | X | X | X | X |
+|Bike Mode|  | X | X | X | X | X |
+|Car Mode|   |  | X | X | X |  |
+|Bus Mode|  |  |  | X | X |  |
+|Rail Mode|  |  |  |   | X |  |
+|Ship Mode|  |  |  |   |  | X |
 
 #### Commands
 ### Example Comamnds.txt
