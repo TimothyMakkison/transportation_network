@@ -42,7 +42,7 @@ ie: Foot can use any link, whereas rail and ship may only go on their respect li
 |Rail Mode|  |  |  |   | X |  |
 |Ship Mode|  |  |  |   |  | X |
 
-#### Commands
+### Commands
 ### Example Comamnds.txt
 ```
 MaxLink
