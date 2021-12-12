@@ -14,13 +14,13 @@ fn parse_int(i: &[u8]) -> IResult<&[u8], i32> {
     let (remainder, digits) = take_while(is_digit)(i)?;
     let (_, integer) = i32(digits)?;
 
-    return Ok((remainder, integer));
+    Ok((remainder, integer))
 }
 
 fn parse_space(i: &[u8]) -> IResult<&[u8], &[u8]> {
     let (remainder, spaces) = take_while(is_space)(i)?;
 
-    return Ok((remainder, spaces));
+    Ok((remainder, spaces))
 }
 
 fn parse_maxdist(i: &[u8]) -> IResult<&[u8], Command> {
@@ -48,7 +48,7 @@ fn parse_findneighbours(i: &[u8]) -> IResult<&[u8], Command> {
 fn parse_places(i: &[u8]) -> IResult<&[u8], Vec<i32>> {
     let (a, b) = separated_list0(tag(" "), parse_int)(i)?;
 
-    return Ok((a, b));
+    Ok((a, b))
 }
 
 fn parse_check(i: &[u8]) -> IResult<&[u8], Command> {

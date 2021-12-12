@@ -106,13 +106,15 @@ impl<N, E> Graph<N, E> {
         index_a: NodeIndex,
         index_b: NodeIndex,
     ) -> (&mut Node<N>, &mut Node<N>) {
-        if index_a == index_b {
-            panic!("Graph does not support self referencing");
-        }
+        assert!(
+            !(index_a == index_b),
+            "Graph does not support self referencing"
+        );
 
-        if max(index_a, index_b) > nodes.len() {
-            panic!("Index out of bounds");
-        }
+        assert!(
+            !(max(index_a, index_b) > nodes.len()),
+            "Index out of bounds"
+        );
 
         unsafe {
             let ptr = nodes.as_mut_ptr();
@@ -121,6 +123,12 @@ impl<N, E> Graph<N, E> {
 
             (node_a, node_b)
         }
+    }
+}
+
+impl<N, E> Default for Graph<N, E> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -212,6 +220,6 @@ impl<'a, E> Iterator for Edges<'a, E> {
             }
         };
 
-        return None;
+        None
     }
 }

@@ -43,7 +43,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("build-and-run-all-commands", |b| {
         b.iter(|| {
             let (proc, commands) = build();
-            run(black_box(proc.clone()), black_box(commands.clone()));
+            run(black_box(proc), black_box(Clone::clone(&commands)));
         })
     });
 }

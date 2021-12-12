@@ -39,9 +39,9 @@ impl PartialOrd for Place {
         let order = self.northings.partial_cmp(&other.northings).unwrap();
 
         if order != Ordering::Equal {
-            return Some(order);
+            Some(order)
         } else {
-            return Some(self.eastings.partial_cmp(&other.eastings).unwrap());
+            Some(self.eastings.partial_cmp(&other.eastings).unwrap())
         }
     }
 }
@@ -52,7 +52,7 @@ impl Eq for Place {
 
 impl Ord for Place {
     fn cmp(&self, other: &Self) -> Ordering {
-        return self.partial_cmp(other).unwrap();
+        self.partial_cmp(other).unwrap()
     }
 }
 
@@ -67,7 +67,7 @@ where
 
     let min = source.iter().min().unwrap();
 
-    let sorted = sort_by_angle(&source, min);
+    let sorted = sort_by_angle(source, min);
 
     let mut stack = vec![sorted[0].clone(), sorted[1].clone()];
 
@@ -94,10 +94,10 @@ where
         .map(|p| {
             let angle = Convex::get_angle(corner, p);
 
-            return MinScored {
+            MinScored {
                 key: angle,
                 value: p.clone(),
-            };
+            }
         })
         .collect();
 

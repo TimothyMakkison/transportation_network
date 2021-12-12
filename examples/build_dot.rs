@@ -19,12 +19,12 @@ fn main() {
 
     let (graph, _) = graph_builder::build(nodes, links);
 
-    let dot = Dot::new(graph.clone(), &fmt_place, &fmt_link, &[&fmt_legend]);
+    let dot = Dot::new(graph, &fmt_place, &fmt_link, &[&fmt_legend]);
     println!("{}", dot);
 
     let mut f = File::create("example.dot").unwrap();
     let output = format!("{}", dot);
-    f.write_all(&output.as_bytes())
+    f.write_all(output.as_bytes())
         .expect("could not write file");
 }
 fn fmt_place(f: &mut fmt::Formatter, data: &Place) -> fmt::Result {
@@ -73,15 +73,15 @@ fn fmt_legend(f: &mut fmt::Formatter) -> fmt::Result {
             mode, mode
         )?;
     }
-    write!(f, "}}\n")?;
+    writeln!(f, "}}")?;
 
     for mode in a {
-        write!(
+        writeln!(
             f,
-            "{0}0 -- {0}1 [label={0} color=\"{1}\" penwidth=\"8\"] \n",
+            "{0}0 -- {0}1 [label={0} color=\"{1}\" penwidth=\"8\"] ",
             mode,
             travel_to_color(*mode)
         )?;
     }
-    write!(f, "}}\n")
+    writeln!(f, "}}")
 }

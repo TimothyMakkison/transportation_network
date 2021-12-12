@@ -47,12 +47,9 @@ pub fn read_commands(path: &str) -> Result<Vec<Command>, String> {
     let mut commands = vec![];
     for line in contents.lines() {
         let parsed = parse_command(line.as_bytes());
-        match parsed {
-            Ok(command) => {
-                commands.push(command.1);
-            }
-            Err(_) => {}
+        if let Ok(command) = parsed {
+            commands.push(command.1);
         }
     }
-    return Ok(commands);
+    Ok(commands)
 }

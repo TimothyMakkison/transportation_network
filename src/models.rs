@@ -53,8 +53,8 @@ impl PlaceDto {
         let lat: f64 = self.latitude;
         let long: f64 = self.longitude;
         let ll_vec: Vector2<f64> = Vector2::new(lat.to_radians(), long.to_radians());
-        let utm_grid = ll2utm(&ll_vec, &ellipsoid);
-        utm_grid
+
+        ll2utm(&ll_vec, &ellipsoid)
     }
 }
 

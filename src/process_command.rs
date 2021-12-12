@@ -40,7 +40,7 @@ impl CommandProcessor {
         let places: Vec<Place> = self
             .graph
             .raw_nodes()
-            .into_iter()
+            .iter()
             .map(|place| place.data.clone())
             .collect();
 
@@ -49,7 +49,7 @@ impl CommandProcessor {
         let mut pair = (&hull[0], &hull[1]);
         let mut max_dist = -1.0;
 
-        for (a, b) in hull.into_iter().tuple_combinations() {
+        for (a, b) in hull.iter().tuple_combinations() {
             let dist = self.distance(a, b);
             if dist > max_dist {
                 max_dist = dist;
@@ -93,13 +93,13 @@ impl CommandProcessor {
         output
     }
 
-    fn check(&self, mode: TravelMode, node_ids: &Vec<i32>) -> String {
+    fn check(&self, mode: TravelMode, node_ids: &[i32]) -> String {
         let indexes: Vec<&usize> = node_ids
-            .into_iter()
-            .map(|x| self.id_map.get(&x).unwrap())
+            .iter()
+            .map(|x| self.id_map.get(x).unwrap())
             .collect();
 
-        let string_ids: Vec<String> = node_ids.into_iter().map(|x| x.to_string()).collect();
+        let string_ids: Vec<String> = node_ids.iter().map(|x| x.to_string()).collect();
         let mut output = format!("Check {} {}", mode, string_ids.join(" "));
 
         for i in 0..indexes.len() - 1 {

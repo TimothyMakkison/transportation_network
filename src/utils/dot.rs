@@ -28,19 +28,19 @@ impl<'a, N, E> Dot<'a, N, E> {
 impl<'a, N, E> fmt::Display for Dot<'a, N, E> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "graph {{")?;
-        for (index, node) in self.graph.raw_nodes().into_iter().enumerate() {
+        for (index, node) in self.graph.raw_nodes().iter().enumerate() {
             write!(f, "{} [", index)?;
             // node.data.fmt(f)?;
             // write!(f, "]\n")?;
             (self.node_func)(f, &node.data)?;
-            write!(f, "]\n")?;
+            writeln!(f, "]")?;
         }
 
         for edge in self.graph.raw_edges() {
             write!(f, "{} -- {} [", edge.source, edge.destination)?;
             // edge.data.fmt(f)?;
             (self.edge_func)(f, &edge.data)?;
-            write!(f, "]\n")?;
+            writeln!(f, "]")?;
         }
 
         for sub_graph in self.subgraphs {
